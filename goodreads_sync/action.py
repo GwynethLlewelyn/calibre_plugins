@@ -5,6 +5,8 @@ __copyright__ = "2011, Grant Drake"
 
 # import os
 from functools import partial
+# to check for mapping functionality
+from collections.abc import Mapping
 
 try:
     from qt.core import QMenu, QToolButton
@@ -88,6 +90,9 @@ class GoodreadsSyncAction(InterfaceAction):
     popup_type = QToolButton.InstantPopup
     action_type = "current"
     pb = None
+    # Seems that we call `users` but parent class doesn't have any! (gwyneth 20260426)
+    from collections import defaultdict
+    your_dict = defaultdict(lambda : None)
 
     def genesis(self):
         self.menu = QMenu(self.gui)
@@ -122,6 +127,16 @@ class GoodreadsSyncAction(InterfaceAction):
         m.clear()
 
         # Only display action submenus if a user has been defined via config dialog
+        if not(hasattr(self, 'users') and hasattr(self.users, '__len__')):
+            return error_dialog(
+                self.gui,
+                _("No Goodreads users"),
+                _(
+                    "Sorry, something is really wrong, as we couldn't find any users at all"
+                ),
+                show=True,
+            )
+
         if len(self.users) > 0:
             # Create menu items for the Add to shelf items
             if c.get(cfg.KEY_DISPLAY_ADD, True):
@@ -222,6 +237,17 @@ class GoodreadsSyncAction(InterfaceAction):
             self.linked_book_submenu.setEnabled(selected_linked)
 
     def create_action_with_users_sub_menu(self, parent_menu, title, action, image_name):
+        # check if we even have a list of users at all!
+        if not(hasattr(self, 'users') and hasattr(self.users, '__len__') and isinstance(self.users, Mapping)):
+            return error_dialog(
+                self.gui,
+                _("Fatal error in Goodreads Sync"),
+                _(
+                    "Couldn't get a valid list of keys for the users! Aborting..."
+                ),
+                show=True,
+            )
+
         if len(list(self.users.keys())) > 1:
             # If we have more than one user, define a sub-menu with user names
             sub_menu = parent_menu.addMenu(get_icon(image_name), title)
@@ -278,6 +304,15 @@ class GoodreadsSyncAction(InterfaceAction):
     def create_sub_menu_for_users_action(self, parent_menu, title, image_name):
         sub_menu = parent_menu.addMenu(get_icon(image_name), title)
         sub_menu.setStatusTip(title)
+        if not(hasattr(self, 'users') and hasattr(self.users, '__len__') and isinstance(self.users, Mapping)):
+            return error_dialog(
+                self.gui,
+                _("Fatal error in Goodreads Sync"),
+                _(
+                    "While creating a submenu for user actions, couldn't a list of users! Aborting..."
+                ),
+                show=True,
+            )
         # If we have more than one user, define a second level sub-menu with user names
         if len(self.users) > 1:
             for user_name in sorted(self.users.keys()):
@@ -291,6 +326,16 @@ class GoodreadsSyncAction(InterfaceAction):
             self.create_sub_menu_for_shelves_action(sub_menu, user_name, title)
 
     def create_sub_menu_for_shelves_action(self, parent_menu, user_name, title):
+        if not(hasattr(self, 'users')):
+            return error_dialog(
+                self.gui,
+                _("Fatal error in Goodreads Sync"),
+                _(
+                    "Couldn't get a valid username! Aborting..."
+                ),
+                show=True,
+            )
+
         user_info = self.users[user_name]
         shelves = user_info.get(cfg.KEY_SHELVES)
         if shelves:
@@ -318,6 +363,15 @@ class GoodreadsSyncAction(InterfaceAction):
     def create_shelves_tags_menu_item(self, parent_menu):
         # Download tags menu needs to support multiple users
         # If we have more than one user, define a second level sub-menu with user names
+        if not(hasattr(self, 'users') and hasattr(self.users, '__len__') and isinstance(self.users, Mapping)):
+            return error_dialog(
+                self.gui,
+                _("Fatal error in Goodreads Sync"),
+                _(
+                    "While creating a menu item for shelves and tags, couldn't a list of users! Aborting..."
+                ),
+                show=True,
+            )
         if len(self.users) > 1:
             sub_menu = parent_menu.addMenu(
                 get_icon("images/tags_download.png"), _("Download tags from shelves")

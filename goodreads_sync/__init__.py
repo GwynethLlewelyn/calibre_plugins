@@ -94,7 +94,7 @@ class ActionGoodreadsSync(InterfaceActionBase):
 
 # For testing, run from command line with this:
 # calibre-debug -e __init__.py
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         from qt.core import QApplication
     except ImportError:
@@ -102,4 +102,4 @@ if __name__ == "__main__":
     from calibre.gui2.preferences import test_widget
 
     app = QApplication([])
-    test_widget("Advanced", "Plugins")
+    test_widget('Advanced', 'Plugins')

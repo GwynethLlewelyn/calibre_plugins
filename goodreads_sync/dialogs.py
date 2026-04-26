@@ -768,7 +768,8 @@ class UpdateReadingProgressDialog(SizePersistedDialog):
             if calibre_book['status'] == ActionStatus.VALID:
                 goodreads_id = calibre_book['goodreads_id']
                 progress = int(calibre_book['calibre_reading_progress']) if calibre_book['calibre_reading_progress'] else None
-                progress = progress if progress >=0 else None
+                # progress = progress if progress >=0 else None
+                progress = progress if isinstance(progress, int) and progress >= 0 else None
                 review_text = None
                 calibre_book['status_comment_text'] if len(calibre_book.get('status_comment_text','')) > 0 else None
                 self.grhttp.update_status(client, goodreads_id, progress, self.progress_is_percent, review_text)

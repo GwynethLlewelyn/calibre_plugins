@@ -9,6 +9,9 @@ from functools import partial
 # calibre Python 3 compatibility.
 from six import text_type as unicode
 
+# to check for mapping functionality
+from collections.abc import Mapping
+
 # Maintain backwards compatibility with older versions of Qt and calibre.
 try:
     from qt.core import (
@@ -317,8 +320,11 @@ class UserComboBox(QComboBox):
     def populate_combo(self, users, selected_text=None):
         self.blockSignals(True)
         self.clear()
-        for user_name in sorted(users.keys()):
-            self.addItem(user_name)
+        if not(isinstance(users, Mapping)):
+            self.addItem("unknown")
+        else:
+            for user_name in sorted(users.keys()):
+                self.addItem(user_name)
         if selected_text:
             idx = self.findText(selected_text)
             self.setCurrentIndex(idx)
@@ -1481,14 +1487,15 @@ class ConfigWidget(QWidget):
             return
         new_user_name = unicode(new_user_name).strip()
         # Verify it does not clash with any other users in the list
-        for user_name in self.users.keys():
-            if user_name.lower() == new_user_name.lower():
-                return error_dialog(
-                    self,
-                    _("Add Failed"),
-                    _("A user with the same name already exists"),
-                    show=True,
-                )
+        if isinstance(self.users, Mapping):
+            for user_name in self.users.keys():
+                if user_name.lower() == new_user_name.lower():
+                    return error_dialog(
+                        self,
+                        _("Add Failed"),
+                        _("A user with the same name already exists"),
+                        show=True,
+                    )
         user_info = {}
         user_info[KEY_USER_ID] = None
         user_info[KEY_USER_TOKEN] = None
@@ -1502,6 +1509,15 @@ class ConfigWidget(QWidget):
         self.user_combo_index_changed()
 
     def delete_user_profile(self):
+        if not(hasattr(self, 'users') and hasattr(self.users, '__len__') and isinstance(self.users, Mapping)):
+            return error_dialog(
+                self.gui,
+                _("Cannot delete user profile"),
+                _(
+                    "Profile for this user cannot be found! Aborting..."
+                ),
+                show=True,
+            )
         if not question_dialog(
             self,
             _("Are you sure?"),
@@ -1541,7 +1557,10 @@ class ConfigWidget(QWidget):
         )
         if not user_token:
             return
-        user_info = self.users[self.user_name]
+        if hasattr(self, 'users') and hasattr(self.users, '__len__') and isinstance(self.users, Mapping):
+            user_info = self.users[self.user_name]
+        else:
+            user_info = "unknown"
         user_info[KEY_USER_TOKEN] = user_token
         user_info[KEY_USER_SECRET] = user_secret
 
