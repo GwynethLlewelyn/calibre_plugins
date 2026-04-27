@@ -30,7 +30,6 @@ except NameError:
 
 from calibre.constants import is_debugging
 from calibre.ebooks.metadata import fmt_sidx, authors_to_string, check_isbn
-from calibre.ebooks.oeb.parse_utils import RECOVER_PARSER
 from calibre.gui2 import error_dialog, open_url
 from calibre.utils.config import tweaks
 from calibre.utils.cleantext import clean_ascii_chars

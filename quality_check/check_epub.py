@@ -25,12 +25,14 @@ from calibre.ebooks.chardet import xml_to_unicode
 from calibre.ebooks.conversion.preprocess import HTMLPreProcessor
 from calibre.ebooks.metadata.epub import Encryption
 from calibre.ebooks.oeb.base import XPath
-from calibre.ebooks.oeb.parse_utils import RECOVER_PARSER, NotHTML, parse_html
+from calibre.ebooks.oeb.parse_utils import NotHTML, parse_html
 from calibre.utils.zipfile import ZipFile, BadZipfile
 
 from calibre_plugins.quality_check.check_base import BaseCheck
 from calibre_plugins.quality_check.dialogs import SearchEpubDialog
 from calibre_plugins.quality_check.helpers import get_title_authors_text
+
+RECOVER_PARSER = etree.XMLParser(recover=True, no_network=True, resolve_entities=False)
 
 META_INF = {
         'container.xml' : True,
@@ -1148,8 +1150,12 @@ class EpubCheck(BaseCheck):
                         if len(metadata):
                             for child in metadata[0]:
                                 try:
-                                    if not child.tag.startswith('{http://purl.org/dc/'):
-                                        return True
+                                    if child.tag.startswith('{http://purl.org/dc/'):
+                                        continue
+                                    # Make sure we exclude the mandatory dcterms:modified meta element for epub3
+                                    if child.attrib.get('property') == 'dcterms:modified':
+                                        continue
+                                    return True
                                 except:
                                     # Dunno how to elegantly handle in lxml parsing
                                     # text like <!-- stuff --> which blows up when
@@ -1604,7 +1610,7 @@ class EpubCheck(BaseCheck):
 
 
     def check_epub_css_justify(self):
-        RE_TEXT_ALIGN = re.compile(r'text\-align:\s*justify', re.UNICODE)
+        RE_TEXT_ALIGN = re.compile(r'text\-align\s*:\s*justify', re.UNICODE)
 
         def evaluate_book(book_id, db):
             path_to_book = db.format_abspath(book_id, 'EPUB', index_is_id=True)

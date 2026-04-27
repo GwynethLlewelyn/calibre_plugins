@@ -1,5 +1,14 @@
 # Barnes & Noble Change Log
 
+## [1.5.8] - 2026-02-09
+### Added
+- Arabic translation
+- Romanian translation
+
+## [1.5.7] - 2025-05-12
+### Fixed
+- Another user-agent update required.
+
 ## [1.5.6] - 2024-08-04
 ### Added
 - Galician translation.

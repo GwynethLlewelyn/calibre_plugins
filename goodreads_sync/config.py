@@ -622,6 +622,27 @@ class MaintainActionsTableWidget(QTableWidget):
         tags.setText(value)
         return tags
 
+    def create_numeric_spinbox(self, column_key, value):
+        is_float = self.custom_columns[column_key]['datatype'] == 'float'
+        if is_float:
+            spinbox = QDoubleSpinBox(self)
+            spinbox.setMinimum(0.0)
+            spinbox.setMaximum(999999.99)  # Supports large values with decimals
+            spinbox.setDecimals(2)
+            try:
+                spinbox.setValue(float(value) if value else 0.0)
+            except (ValueError, TypeError):
+                spinbox.setValue(0.0)
+        else:
+            spinbox = QSpinBox(self)
+            spinbox.setMinimum(0)
+            spinbox.setMaximum(999999)  # Supports large page counts
+            try:
+                spinbox.setValue(int(value) if value else 0)
+            except (ValueError, TypeError):
+                spinbox.setValue(0)
+        return spinbox
+
     def get_taglike_column_values(self, column_key):
         label = self.db.field_metadata.key_to_label(column_key)
         values = list(self.db.all_custom(label=label))
@@ -644,6 +665,9 @@ class MaintainActionsTableWidget(QTableWidget):
             column_key.startswith("#")
             and self.custom_columns[column_key]["datatype"] == "enumeration"
         )
+
+    def is_numeric_custom_column(self, column_key):
+        return column_key.startswith('#') and self.custom_columns[column_key]['datatype'] in ('int', 'float')
 
     def add_row(self):
         self.setFocus()

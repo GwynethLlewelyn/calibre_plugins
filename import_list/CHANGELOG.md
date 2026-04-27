@@ -1,5 +1,28 @@
 # Import List Change Log
 
+## [1.9.9] - 2026-02-09
+### Added
+- Arabic translation
+### Fixed
+- Debug output warning from Python
+- 
+## [1.9.8] - 2025-05-04
+### Fixed
+- If autosizing columns to contents, do not let them exceed a particular width to prevent overlong column scroll issues.
+- Set horizontal scroll mode to per pixel to prevent edge case where cannot resize oversize column.
+
+## [1.9.7] - 2025-02-17
+### Fixed
+- Fix incorrect regex expressions for the Goodreads predefined parsing.
+
+## [1.9.6] - 2025-02-16
+### Fixed
+- Calibre 7.26 removed the `set_auto_complete_function` delegate as no longer necessary. (cbhaley)
+
+## [1.9.5] - 2025-02-15
+### Fixed
+- Calibre 7.26 removed the `set_database` delegate as no longer necessary. (cbhaley)
+
 ## [1.9.4] - 2024-04-01
 ### Fixed
 - Fix for calibre 7 for QFileDialog errors.

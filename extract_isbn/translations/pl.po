@@ -3,7 +3,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Piotr Strębski <strebski@gmail.com>, 2022
+# Piotr Strebski <strebski@gmail.com>, 2022
 # Adam Humienny <adam.humienny@gmail.com>, 2022
 # Marcin Kozioł <koziol.martin@gmail.com>, 2022
 # Ola Kleniewska <anyzeklove@gmail.com>, 2022

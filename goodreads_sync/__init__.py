@@ -23,13 +23,12 @@ class ActionGoodreadsSync(InterfaceActionBase):
     The reason for having two classes is that it allows the command line
     calibre utilities to run without needing to load the GUI libraries.
 
-    """
-
-    name = "Goodreads Sync"
-    description = "Sync from Calibre with the shelves of your goodreads.com account"
-    supported_platforms = ["windows", "osx", "linux"]
-    author = "Grant Drake"
-    version = (1, 16, 12)
+    '''
+    name                    = 'Goodreads Sync'
+    description             = 'Sync from Calibre with the shelves of your goodreads.com account'
+    supported_platforms     = ['windows', 'osx', 'linux']
+    author                  = 'Grant Drake'
+    version                 = (1, 17, 2)
     minimum_calibre_version = (5, 0, 0)
 
     #: This field defines the GUI plugin class that contains all the code
@@ -94,7 +93,7 @@ class ActionGoodreadsSync(InterfaceActionBase):
 
 # For testing, run from command line with this:
 # calibre-debug -e __init__.py
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         from qt.core import QApplication
     except ImportError:
@@ -102,4 +101,4 @@ if __name__ == '__main__':
     from calibre.gui2.preferences import test_widget
 
     app = QApplication([])
-    test_widget('Advanced', 'Plugins')
+    test_widget("Advanced", "Plugins")

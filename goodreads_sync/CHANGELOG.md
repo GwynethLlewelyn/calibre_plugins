@@ -10,6 +10,27 @@
 - Clean up unPythonesque code as flagged by a Python linter. (@GwynethLlewelyn)
 - Reviewed logic for using `debug_print()`. (@GwynethLlewelyn)
 
+## [1.17.1] - 2026-04-15
+### Added
+- When editing sync actions it will now support numeric columns e.g. set reading progress column to 100
+
+## [1.17.0] - 2026-04-11
+### Added
+- Added checkboxes to `Sync From Goodreads Shelf` dialog to allow for selective syncing. [@albyofdoom]
+- Reordered columns so that like columns are next to each for easier comparison. [@albyofdoom]
+- Added color highlighting so you can tell at a glance when Goodreads data and Calibre data don't match. [@albyofdoom]
+- Korean translation
+
+## [1.16.13] - 2026-02-09
+### Added
+- Arabic translation
+### Fixed
+- Debug output warning from Python
+- 
+## [1.16.12] - 2025-10-04
+### Changed
+- RECOVER_PARSER removed from Calibre, see https://github.com/kiwidude68/calibre_plugins/issues/131
+
 ## [1.16.11] - 2024-11-11
 ### Fixed
 - Display the user friendly Goodreads message when attempting an action like Add to shelf if the book is invalidly linked.

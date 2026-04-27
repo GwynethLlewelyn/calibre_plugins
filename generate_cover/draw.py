@@ -124,8 +124,8 @@ def draw_sized_text(img, dw, line, top, left_margin, right_margin,
                     break
         p.setFont(line.font)
         br = p.drawText(QRect(
-            left_margin, top, img.size[0] - left_margin - right_margin,
-            img.size[1] - top), flags | Qt.TextWordWrap, line.text)
+            int(left_margin), int(top), int(img.size[0] - left_margin - right_margin), int(img.size[1] - top)), 
+            flags | Qt.TextWordWrap, line.text)
         return br.bottom()
     finally:
         p.end()
@@ -298,7 +298,7 @@ def generate_cover_for_book(mi, options=None, db=None):
     if custom_text:
         from calibre.ebooks.metadata.book.formatter import SafeFormat
         custom_text = SafeFormat().safe_format(
-            custom_text.replace('\n', '<br/>'), mi, 'GC template error', mi)
+            custom_text, mi, 'GC template error', mi).replace('<br/>','\n')
 
     fonts = options[cfg.KEY_FONTS]
     margin = options[cfg.KEY_MARGINS]['text']
