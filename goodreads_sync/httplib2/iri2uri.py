@@ -1,25 +1,13 @@
-"""
-iri2uri
-
-Converts an IRI to a URI.
-
-"""
+# -*- coding: utf-8 -*-
+"""Converts an IRI to a URI."""
 
 __author__ = "Joe Gregorio (joe@bitworking.org)"
 __copyright__ = "Copyright 2006, Joe Gregorio"
 __contributors__ = []
 __version__ = "1.0.0"
 __license__ = "MIT"
-__history__ = """
-"""
 
-# calibre Python 3 compatibility.
-try:
-    from urllib.parse import urlsplit, urlunsplit
-except ImportError:
-    from urlparse import urlsplit, urlunsplit
-# import six
-from six import text_type as unicode
+import urllib.parse
 
 # Convert an IRI to a URI following the rules in RFC 3987
 #
@@ -64,7 +52,7 @@ def encode(c):
         if i < low:
             break
         if i >= low and i <= high:
-            retval = "".join(["%%%2X" % ord(o) for o in c.encode("utf-8")])
+            retval = "".join(["%%%2X" % o for o in c.encode("utf-8")])
             break
     return retval
 
@@ -73,13 +61,13 @@ def iri2uri(uri):
     """Convert an IRI to a URI. Note that IRIs must be
     passed in a unicode strings. That is, do not utf-8 encode
     the IRI before passing it into the function."""
-    if isinstance(uri, unicode):
-        (scheme, authority, path, query, fragment) = urlsplit(uri)
-        #         authority = authority.encode('idna')
+    if isinstance(uri, str):
+        (scheme, authority, path, query, fragment) = urllib.parse.urlsplit(uri)
+        authority = authority.encode("idna").decode("utf-8")
         # For each character in 'ucschar' or 'iprivate'
         #  1. encode as utf-8
         #  2. then %-encode each octet of that utf-8
-        uri = urlunsplit((scheme, authority, path, query, fragment))
+        uri = urllib.parse.urlunsplit((scheme, authority, path, query, fragment))
         uri = "".join([encode(c) for c in uri])
     return uri
 

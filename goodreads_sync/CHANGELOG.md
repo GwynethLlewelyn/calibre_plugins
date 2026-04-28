@@ -1,12 +1,11 @@
 # Changelog
 
-## [1.16.12] - 2025-02-12
+## [1.17.2] - 2025-04-28
 ### Fixed
-- Deal with HTTP proxy issues ([#104](https://github.com/kiwidude68/calibre_plugins/issues/104)), on systems that have them active:
-  - In the included copy of the `httplib2` library, deal with the import of `socks`
-    according to Python 3+ rules (as an additional choice). (@GwynethLlewelyn)
-  - Add more error checking & debugging messages to catch edge cases earlier. (@GwynethLlewelyn)
+- Deal with HTTP proxy issues ([#104](https://github.com/kiwidude68/calibre_plugins/issues/104))
+- Under Python 3.12+, the included httplib2 needs to be more recent. (@GwynethLlewelyn)
 ### Updated
+- Bumped httplib2 from 0.10.3 to 0.31.2 (@GwynethLlewelyn)
 - Clean up unPythonesque code as flagged by a Python linter. (@GwynethLlewelyn)
 - Reviewed logic for using `debug_print()`. (@GwynethLlewelyn)
 
@@ -26,7 +25,7 @@
 - Arabic translation
 ### Fixed
 - Debug output warning from Python
-- 
+-
 ## [1.16.12] - 2025-10-04
 ### Changed
 - RECOVER_PARSER removed from Calibre, see https://github.com/kiwidude68/calibre_plugins/issues/131

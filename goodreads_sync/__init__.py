@@ -6,7 +6,7 @@ __contributors__ = [
     "Gwyneth Llewelyn",
 ]
 __license__ = "GPL v3"
-__version__ = "1.17.1"
+__version__ = "1.17.2"
 
 
 # The class that all Interface Action plugin wrappers must inherit from
