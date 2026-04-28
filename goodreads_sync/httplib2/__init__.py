@@ -45,13 +45,115 @@ import urllib.parse
 import zlib
 
 try:
-    import socks
-except ImportError:
-    socks = None
-from . import auth
-from .error import *
-from .iri2uri import iri2uri
+    from httplib2 import socks
+except ImportError as err:
+    print("[ERROR] httplib2 - init: Could not import `httplib2.socks`, error was: %s, trying direct `socks` import next" %
+          err)
+    try:
+        import socks
+        print("[INFO] httplib2: direct `socks` import worked.")
+    except (ImportError, AttributeError) as e:
+        print("[ERROR] httplib2 - init: Could not directly import `socks`! Error was: ", e)
+        try:
+            from . import socks
+        except (ImportError, AttributeError) as e:
+            print("[ERROR] httplib2 - init: Could not import `socks` in `.`, error was: ", e)
+            socks = None
 
+    if socks is None:
+        print('[ERROR] httplib2: no `socks`, so nothing will work!')
+    else:
+        print("[INFO] httplib2: `socks` correctly initialised.")
+
+try:
+    from httplib2 import auth
+except ImportError as err:
+    print("[ERROR] httplib2 - init: Could not import `httplib2.auth`, error was: %s, trying direct `auth` import next" %
+          err)
+    try:
+        import auth
+        print("[INFO] httplib2: direct `auth` import worked.")
+    except (ImportError, AttributeError) as e:
+        print("[ERROR] httplib2 - init: Could not import directly `auth`! Error was: ", e)
+        try:
+            from . import auth
+        except (ImportError, AttributeError) as e:
+            print("[ERROR] httplib2 - init: Could not import `auth` in `.`, error was: ", e)
+            auth = None
+
+    if auth is None:
+        print('[ERROR] httplib2: no `auth` found!')
+    else:
+        print("[INFO] `auth` correctly initialised.")
+
+
+try:
+    from httplib2 import error
+except ImportError as err:
+    print("[ERROR] httplib2 - init: Could not import `httplib2.error`, error was: %s, trying direct `error` import next" %
+          err)
+    try:
+        import error
+        print("[INFO] httplib2: direct `error` import worked.")
+    except (ImportError, AttributeError) as e:
+        print("[ERROR] httplib2 - init: Could not import directly `error`! Error was: ", e)
+        try:
+            from . import error
+        except (ImportError, AttributeError) as e:
+            print("[ERROR] httplib2 - init: Could not import `error` in `.`, error was: ", e)
+            error = None
+
+    if error is None:
+        print('[ERROR] httplib2: no `error` found!')
+    else:
+        print("[INFO] `error` correctly initialised.")
+
+"""
+try:
+    from httplib2 import iri2url
+except ImportError as err:
+    print("[ERROR] httplib2 - init: Could not import `httplib2.iri2url`, error was: %s, trying direct `iri2url` import next" %
+          err)
+    try:
+        import iri2url
+        print("[INFO] httplib2: direct `iri2url` import worked.")
+    except (ImportError, AttributeError) as e:
+        print("[ERROR] httplib2 - init: Could not import directly `iri2url`! Error was: ", e)
+        try:
+            from . import iri2url
+        except (ImportError, AttributeError) as e:
+            print("[ERROR] httplib2 - init: Could not import `iri2url` in `.`, error was: ", e)
+            iri2url = None
+
+    if iri2url is None:
+        print('[ERROR] httplib2: no `iri2url` found!')
+    else:
+        print("[INFO] `iri2url` correctly initialised.")
+
+try:
+    import calibre_plugins.goodreads_sync.httplib2.iri2url
+except ImportError as err:
+    print("[ERROR] httplib2 - init: Could not import `calibre_plugins.goodreads_sync.httplib2.iri2url`, error was: %s, trying `iri2url` import from `.` next" %
+          err)
+    try:
+        from iri2url import *
+        print("[INFO] httplib2: `iri2url` import from `.` worked.")
+    except (ImportError, AttributeError) as e:
+        print("[ERROR] httplib2 - init: Could not import `iri2url` in `.`, error was: ", e)
+        iri2url = None
+
+    if iri2url is None:
+        print('[ERROR] httplib2: no `iri2url` found!')
+    else:
+        print("[INFO] `iri2url` correctly initialised.")
+"""
+
+if sys.version_info >= (2, 3):
+    from calibre_plugins.goodreads_sync.httplib2.iri2uri import iri2uri
+else:
+
+    def iri2uri(uri):
+        return uri
 
 def has_timeout(timeout):
     if hasattr(socket, "_GLOBAL_DEFAULT_TIMEOUT"):
@@ -119,9 +221,22 @@ SAFE_METHODS = ("GET", "HEAD", "OPTIONS", "TRACE")
 REDIRECT_CODES = frozenset((300, 301, 302, 303, 307, 308))
 
 
-from httplib2 import certs
+try:
+    from httplib2 import certs
+except (ImportError, AttributeError) as e:
+    print("[ERROR] httplib2 - init: Could not import `certs` from `httplib2`! Error was: ", e)
+    try:
+        from calibre_plugins.goodreads_sync.httplib2 import certs
+    except (ImportError, AttributeError) as e:
+        print("[ERROR] httplib2 - init: Could not import `certs` from `calibre_plugins.goodreads_sync.httplib2`! Error was: ", e)
+        certs = None
 
-CA_CERTS = certs.where()
+if certs is None:
+    print('[ERROR] httplib2: no `certs` found!')
+else:
+    print("[INFO] `certs` correctly initialised.")
+
+CA_CERTS = certs.where() if certs is not None else ""
 
 # PROTOCOL_TLS is python 3.5.3+. PROTOCOL_SSLv23 is deprecated.
 # Both PROTOCOL_TLS and PROTOCOL_SSLv23 are equivalent and means:
@@ -179,7 +294,14 @@ def _build_ssl_context(
         context.check_hostname = not disable_ssl_certificate_validation
 
     if not disable_ssl_certificate_validation:
-        context.load_verify_locations(ca_certs)
+        try:
+            context.load_verify_locations(ca_certs)
+        except NotADirectoryError:
+            print("[ERROR] Certificate file at %s isn't inside a valid directory" % ca_certs)
+        except FileNotFoundError:
+            print("[ERROR] Certificate file at %s not found" % ca_certs)
+        except Exception:
+            print("[ERROR] Unknown errot for certificate file %s" % ca_certs)
 
     if cert_file:
         context.load_cert_chain(cert_file, key_file, key_password)

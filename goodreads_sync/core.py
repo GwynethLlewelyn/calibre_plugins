@@ -1,21 +1,22 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 __license__ = "GPL v3"
 __copyright__ = "2011, Grant Drake"
 
-import re
+import collections
 import json
 import os
+import re
 import traceback
-import collections
 import xml.etree.ElementTree as et
 
 # calibre Python 3 compatibility.
 try:
-    from urllib.parse import parse_qsl, urlencode, quote_plus
+    from urllib.parse import parse_qsl, quote_plus, urlencode
 except ImportError:
+    from urllib import quote_plus, urlencode
+
     from urlparse import parse_qsl
-    from urllib import urlencode, quote_plus
 # from six import text_type as unicode
 
 try:
@@ -28,19 +29,17 @@ try:
 except NameError:
     pass  # load_translations() added in calibre 1.9
 
-from calibre.constants import is_debugging
-from calibre.ebooks.metadata import fmt_sidx, authors_to_string, check_isbn
-from calibre.gui2 import error_dialog, open_url
-from calibre.utils.config import tweaks
-from calibre.utils.cleantext import clean_ascii_chars
-from calibre.utils.date import parse_date, now, UNDEFINED_DATE
-from calibre import get_parsed_proxy
-from calibre import browser
-from calibre.devices.usbms.driver import debug_print
-
-import calibre_plugins.goodreads_sync.oauth2 as oauth
-import calibre_plugins.goodreads_sync.httplib2 as httplib2
 import calibre_plugins.goodreads_sync.config as cfg
+import calibre_plugins.goodreads_sync.httplib2 as httplib2
+import calibre_plugins.goodreads_sync.oauth2 as oauth
+from calibre import browser, get_parsed_proxy
+from calibre.constants import is_debugging
+from calibre.devices.usbms.driver import debug_print
+from calibre.ebooks.metadata import authors_to_string, check_isbn, fmt_sidx
+from calibre.gui2 import error_dialog, open_url
+from calibre.utils.cleantext import clean_ascii_chars
+from calibre.utils.config import tweaks
+from calibre.utils.date import UNDEFINED_DATE, now, parse_date
 
 
 def get_searchable_author(authors):
@@ -259,7 +258,11 @@ class HttpHelper(object):
                 return (None, None)
 
         except ValueError as err:
-            debug_print("_handle_failure: Failed to parse content into an error tree: %s, error was: %s", content, err)
+            debug_print(
+                "_handle_failure: Failed to parse content into an error tree: %s, error was: %s",
+                content,
+                err,
+            )
             pass
 
         if response["status"] == "404":
@@ -763,8 +766,7 @@ class HttpHelper(object):
             # We have an error situation where the returned xml is being corrupted due to the
             # Goodreads bug for encodings. We will skip this book
             debug_print(
-                "Goodreads shelf error due to corruption bug. Skipping book: %s"
-                % book
+                "Goodreads shelf error due to corruption bug. Skipping book: %s" % book
             )
             return None
         author_nodes = book_node.findall("authors/author")
@@ -884,8 +886,9 @@ class HttpHelper(object):
     def get_edition_books_for_work_id(self, work_id):
         # This is a bit of filth - currently do not have access to the API call which will do
         # the equivalent so must scrape from the website instead.
-        from calibre import browser
         import socket
+
+        from calibre import browser
         from lxml.html import fromstring, tostring
 
         url = "https://www.goodreads.com/work/editions/%s" % work_id
