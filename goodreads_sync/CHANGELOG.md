@@ -8,6 +8,8 @@
 - Bumped httplib2 from 0.10.3 to 0.31.2 (@GwynethLlewelyn)
 - Clean up unPythonesque code as flagged by a Python linter. (@GwynethLlewelyn)
 - Reviewed logic for using `debug_print()`. (@GwynethLlewelyn)
+### Added
+- Added the pyparsing module, version 3.3.2, because httplib2 now needs it. (@GwynethLlewelyn)
 
 ## [1.17.1] - 2026-04-15
 ### Added
