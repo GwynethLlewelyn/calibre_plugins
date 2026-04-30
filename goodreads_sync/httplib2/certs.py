@@ -27,10 +27,11 @@ BUILTIN_CA_CERTS = os.path.join(
 def where():
     env = os.environ.get("HTTPLIB2_CA_CERTS")
     if env is not None:
+        print(f"HTTPLIB2_CA_CERTS={env}")
         if os.path.isfile(env):
             return env
         else:
-            raise RuntimeError("Environment variable HTTPLIB2_CA_CERTS not a valid file")
+            raise RuntimeError("Environment variable HTTPLIB2_CA_CERTS is not a valid file")
     if custom_ca_locater_available:
         return custom_ca_locater_where()
     if certifi_available:

@@ -500,6 +500,7 @@ class socksocket(socket.socket):
                 portnum = self.__proxy[2]
             else:
                 portnum = 8080
+            print(f"socks.socksocket.connect: {self.__proxy[1]=} {portnum=}")
             _orgsocket.connect(self, (self.__proxy[1], portnum))
             if destpair[1] == 443:
                 self.__negotiatehttp(destpair[0], destpair[1])

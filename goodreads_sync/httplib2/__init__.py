@@ -236,7 +236,10 @@ if certs is None:
 else:
     print("[INFO] `certs` correctly initialised.")
 
-CA_CERTS = certs.where() if certs is not None else ""
+# Dealing with scoping issues
+CA_CERTS = ""
+if certs is not None:
+    CA_CERTS = certs.where()
 
 # PROTOCOL_TLS is python 3.5.3+. PROTOCOL_SSLv23 is deprecated.
 # Both PROTOCOL_TLS and PROTOCOL_SSLv23 are equivalent and means:
@@ -1188,6 +1191,7 @@ class HTTPConnectionWithTimeout(http.client.HTTPConnection):
                 continue
             break
         if not self.sock:
+            print(f"httplib2.HTTPConnectionWithTimeout: {self.host=} {self.port=}")
             raise socket_err
 
 
