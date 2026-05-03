@@ -44,6 +44,7 @@ import time
 import urllib.parse
 import zlib
 
+"""
 try:
     from httplib2 import socks
 except ImportError as err:
@@ -54,17 +55,19 @@ except ImportError as err:
         print("[INFO] httplib2: direct `socks` import worked.")
     except (ImportError, AttributeError) as e:
         print("[ERROR] httplib2 - init: Could not directly import `socks`! Error was: ", e)
-        try:
-            from . import socks
-        except (ImportError, AttributeError) as e:
-            print("[ERROR] httplib2 - init: Could not import `socks` in `.`, error was: ", e)
-            socks = None
+"""
+try:
+    from . import socks
+except (ImportError, AttributeError) as e:
+    print("[ERROR] httplib2 - init: Could not import `socks` in `.`, error was: ", e)
+    socks = None
 
-    if socks is None:
-        print('[ERROR] httplib2: no `socks`, so nothing will work!')
-    else:
-        print("[INFO] httplib2: `socks` correctly initialised.")
+if socks is None:
+    print('[ERROR] httplib2: no `socks`, so nothing will work!')
+else:
+    print("[INFO] httplib2: `socks` correctly initialised.")
 
+"""
 try:
     from httplib2 import auth
 except ImportError as err:
@@ -75,18 +78,19 @@ except ImportError as err:
         print("[INFO] httplib2: direct `auth` import worked.")
     except (ImportError, AttributeError) as e:
         print("[ERROR] httplib2 - init: Could not import directly `auth`! Error was: ", e)
-        try:
-            from . import auth
-        except (ImportError, AttributeError) as e:
-            print("[ERROR] httplib2 - init: Could not import `auth` in `.`, error was: ", e)
-            auth = None
+"""
+try:
+    from . import auth
+except (ImportError, AttributeError) as e:
+    print("[ERROR] httplib2 - init: Could not import `auth` in `.`, error was: ", e)
+    auth = None
 
-    if auth is None:
-        print('[ERROR] httplib2: no `auth` found!')
-    else:
-        print("[INFO] `auth` correctly initialised.")
+if auth is None:
+    print('[ERROR] httplib2: no `auth` found!')
+else:
+    print("[INFO] `auth` correctly initialised.")
 
-
+"""
 try:
     from httplib2 import error
 except ImportError as err:
@@ -97,16 +101,17 @@ except ImportError as err:
         print("[INFO] httplib2: direct `error` import worked.")
     except (ImportError, AttributeError) as e:
         print("[ERROR] httplib2 - init: Could not import directly `error`! Error was: ", e)
-        try:
-            from . import error
-        except (ImportError, AttributeError) as e:
-            print("[ERROR] httplib2 - init: Could not import `error` in `.`, error was: ", e)
-            error = None
+"""
+try:
+    from . import error
+except (ImportError, AttributeError) as e:
+    print("[ERROR] httplib2 - init: Could not import `error` in `.`, error was: ", e)
+    error = None
 
-    if error is None:
-        print('[ERROR] httplib2: no `error` found!')
-    else:
-        print("[INFO] `error` correctly initialised.")
+if error is None:
+    print('[ERROR] httplib2: no `error` found!')
+else:
+    print("[INFO] `error` correctly initialised.")
 
 """
 try:
@@ -148,17 +153,30 @@ except ImportError as err:
         print("[INFO] `iri2url` correctly initialised.")
 """
 
+#iri2url = False# Checking if we can import `iri2uri()`
 if sys.version_info >= (2, 3):
-    from calibre_plugins.goodreads_sync.httplib2.iri2uri import iri2uri
-else:
+    try:
+        from calibre_plugins.goodreads_sync.httplib2.iri2uri import iri2uri
+    except (ImportError, AttributeError) as e:
+        print("[ERROR] httplib2 - init: Could not import `iri2uri`, error was: ", e)
+        iri2uri = None
+    else:
+#        iri2url = True
+        print("[INFO] `iri2uri` correctly initialised.")
 
+#if iri2url is False:
+if iri2uri is not None:
     def iri2uri(uri):
+        """
+        Fake stub function, does NOT handle international characters in URI!
+        """
         return uri
 
 def has_timeout(timeout):
     if hasattr(socket, "_GLOBAL_DEFAULT_TIMEOUT"):
         return timeout is not None and timeout is not socket._GLOBAL_DEFAULT_TIMEOUT
     return timeout is not None
+
 
 
 __all__ = [
@@ -488,7 +506,7 @@ def _entry_disposition(response_headers, request_headers):
                 freshness_lifetime = 0
         elif "expires" in response_headers:
             expires = email.utils.parsedate_tz(response_headers["expires"])
-            if None == expires:
+            if expires is None:
                 freshness_lifetime = 0
             else:
                 freshness_lifetime = max(0, calendar.timegm(expires) - date)
@@ -1032,7 +1050,7 @@ class ProxyInfo(object):
         )
 
     def isgood(self):
-        return socks and (self.proxy_host != None) and (self.proxy_port != None)
+        return socks and (self.proxy_host is not None) and (self.proxy_port is not None)
 
     def applies_to(self, hostname):
         return not self.bypass_host(hostname)
@@ -1244,6 +1262,12 @@ class HTTPSConnectionWithTimeout(http.client.HTTPSConnection):
 
     def connect(self):
         """Connect to a host on a given (SSL) port."""
+
+        # Deal with scoping issues by declaring those first:
+        use_proxy = False
+        proxy_type = None
+        proxy_headers = None
+
         if self.proxy_info and self.proxy_info.isgood() and self.proxy_info.applies_to(self.host):
             use_proxy = True
             (
@@ -1259,12 +1283,13 @@ class HTTPSConnectionWithTimeout(http.client.HTTPSConnection):
             host = proxy_host
             port = proxy_port
         else:
-            use_proxy = False
+            # use_proxy = False # default value
 
             host = self.host
             port = self.port
-            proxy_type = None
-            proxy_headers = None
+
+        print(f"Proxy being used?  {use_proxy}")
+        print(f"Host: {host} port: {port}")
 
         socket_err = None
 
@@ -1284,7 +1309,10 @@ class HTTPSConnectionWithTimeout(http.client.HTTPSConnection):
                     sock.settimeout(self.timeout)
                 sock.connect((self.host, self.port))
 
-                self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+                try:
+                    self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+                except Exception as e:
+                    print(f"using a wrapper socket failed, error was {e}")
 
                 # Python 3.3 compatibility: emulate the check_hostname behavior
                 if not hasattr(self._context, "check_hostname") and not self.disable_ssl_certificate_validation:
@@ -1303,7 +1331,7 @@ class HTTPSConnectionWithTimeout(http.client.HTTPSConnection):
                                 str((proxy_host, proxy_port, proxy_rdns, proxy_user, proxy_pass, proxy_headers,))
                             )
                         )
-            except (ssl.SSLError, ssl.CertificateError) as e:
+            except (ssl.SSLError, ssl.CertificateError):
                 if sock:
                     sock.close()
                 if self.sock:
@@ -1600,7 +1628,7 @@ class Http(object):
                     if "location" in response:
                         location = response["location"]
                         (scheme, authority, path, query, fragment) = parse_uri(location)
-                        if authority == None:
+                        if authority is None:
                             response["location"] = urllib.parse.urljoin(absolute_uri, location)
                     if response.status == 308 or (response.status == 301 and (method in self.safe_methods)):
                         response["-x-permanent-redirect-url"] = response["location"]
@@ -1811,9 +1839,9 @@ a string that contains the response entity body.
                         return (response, content)
 
                     if entry_disposition == "STALE":
-                        if "etag" in info and not self.ignore_etag and not "if-none-match" in headers:
+                        if "etag" in info and not self.ignore_etag and "if-none-match" not in headers:
                             headers["if-none-match"] = info["etag"]
-                        if "last-modified" in info and not "last-modified" in headers:
+                        if "last-modified" in info and "last-modified" not in headers:
                             headers["if-modified-since"] = info["last-modified"]
                     elif entry_disposition == "TRANSPARENT":
                         pass

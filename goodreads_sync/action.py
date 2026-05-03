@@ -326,7 +326,7 @@ class GoodreadsSyncAction(InterfaceAction):
             self.create_sub_menu_for_shelves_action(sub_menu, user_name, title)
 
     def create_sub_menu_for_shelves_action(self, parent_menu, user_name, title):
-        if not(hasattr(self, 'users')):
+        if not hasattr(self, 'users'):
             return error_dialog(
                 self.gui,
                 _("Fatal error in Goodreads Sync"),

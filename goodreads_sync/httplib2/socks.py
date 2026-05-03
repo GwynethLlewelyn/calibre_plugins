@@ -475,10 +475,10 @@ class socksocket(socket.socket):
         """
         # Do a minimal input check first
         if (
-            (not type(destpair) in (list, tuple))
+            (type(destpair) not in (list, tuple))
             or (len(destpair) < 2)
             or (not isinstance(destpair[0], six.string_types))
-            or (type(destpair[1]) != int)
+            or (not isinstance(destpair[1], int))
         ):
             raise GeneralProxyError((5, _generalerrors[5]))
         if self.__proxy[0] == PROXY_TYPE_SOCKS5:
