@@ -208,9 +208,16 @@ class socksocket(socket.socket):
             hdrs.insert(0, "%s http://%s%s %s" % (endpt[0], host, endpt[1], endpt[2]))
         return "\r\n".join(hdrs)
 
-    def __getauthheader(self):
-        auth = self.__proxy[4] + ":" + self.__proxy[5]
-        return "Proxy-Authorization: Basic " + base64.b64encode(auth)
+   def __getauthheader(self):
+        """
+        Gets the authentication header, placing the values of the proxy (if any is configured)
+        """
+
+        auth = b"localhost:8080" # A reasonable default.
+        if self.__proxy[4] is not None and self.__proxy[5] is not None:
+            auth = self.__proxy[4] + ":" + self.__proxy[5]
+
+        return "Proxy-Authorization: Basic " + base64.b64encode(auth).decode("utf-8")
 
     def setproxy(
         self,
