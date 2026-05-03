@@ -8,6 +8,7 @@ try:
     from certifi import where as certifi_where
     certifi_available = True
 except ImportError:
+    print("Mozilla certificates not found")
     pass
 
 custom_ca_locater_available = False
@@ -16,6 +17,7 @@ try:
     from ca_certs_locater import get as custom_ca_locater_where
     custom_ca_locater_available = True
 except ImportError:
+    print("Custom certificate locator not found")
     pass
 
 
