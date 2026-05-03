@@ -208,7 +208,7 @@ class socksocket(socket.socket):
             hdrs.insert(0, "%s http://%s%s %s" % (endpt[0], host, endpt[1], endpt[2]))
         return "\r\n".join(hdrs)
 
-   def __getauthheader(self):
+    def __getauthheader(self):
         """
         Gets the authentication header, placing the values of the proxy (if any is configured)
         """
