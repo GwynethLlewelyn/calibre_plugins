@@ -1188,7 +1188,7 @@ class CalibreDbHelper(object):
 
         elif typ == 'rating':
             for book in goodreads_books:
-                debug_print("_apply_custom_column_changes_to_books: book=", book )
+                debug_print("_apply_custom_column_changes_to_books: book=%s, value=%s"%(book, value))
                 if not (value in book):
                     continue
                 calibre_id = book['calibre_id']
@@ -1215,8 +1215,7 @@ class CalibreDbHelper(object):
                     if value == 'none':
                         new_value = 0.
                     else:
-                        new_value = book[value]
-                        new_value = float(new_value)
+                        new_value = float(value)
                 elif action == 'REMOVE':
                     new_value = 0 # Value for any REMOVE action
                 if new_value != existing_value:
