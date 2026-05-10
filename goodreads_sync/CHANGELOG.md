@@ -11,6 +11,10 @@
 ### Added
 - Added the pyparsing module, version 3.3.2, because httplib2 now needs it. (@GwynethLlewelyn)
 
+## [1.17.2] - 2026-05-07
+### Fixed
+- Sync actions for numeric columns having a key error
+
 ## [1.17.1] - 2026-04-15
 ### Added
 - When editing sync actions it will now support numeric columns e.g. set reading progress column to 100
